@@ -7,8 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.speedcurve.databinding.FragmentSliderBinding
-import com.example.speedcurve.view.main.MainViewModel
-import com.example.speedcurve.view.speedcurve.SpeedCurveFragment
+import com.example.speedcurve.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.InternalCoroutinesApi
 

@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.speedcurve.databinding.FragmentImagePlayBinding
 import com.example.speedcurve.util.getFrameForPosition
-import com.example.speedcurve.view.main.MainViewModel
+import com.example.speedcurve.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

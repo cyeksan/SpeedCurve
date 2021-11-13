@@ -13,6 +13,7 @@ import com.example.speedcurve.databinding.ActivityMainBinding
 import com.example.speedcurve.view.imageplay.ImagePlayFragment
 import com.example.speedcurve.view.slider.SliderFragment
 import com.example.speedcurve.view.speedcurve.SpeedCurveFragment
+import com.example.speedcurve.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.isActive

@@ -9,8 +9,7 @@ import androidx.fragment.app.activityViewModels
 import com.example.speedcurve.R
 import com.example.speedcurve.databinding.FragmentSpeedCurveBinding
 import com.example.speedcurve.util.toast
-import com.example.speedcurve.view.main.MainViewModel
-import com.example.speedcurve.view.slider.SliderFragment
+import com.example.speedcurve.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

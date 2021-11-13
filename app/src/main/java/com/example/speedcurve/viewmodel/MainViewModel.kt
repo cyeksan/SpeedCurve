@@ -1,4 +1,4 @@
-package com.example.speedcurve.view.main
+package com.example.speedcurve.viewmodel
 
 import android.content.Context
 import androidx.lifecycle.LiveData
@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import com.example.speedcurve.R
 import com.example.speedcurve.repository.FrameInfoGenerator
 import com.example.speedcurve.util.Constants
-import com.example.speedcurve.util.toast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect

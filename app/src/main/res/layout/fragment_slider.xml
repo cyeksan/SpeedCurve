@@ -7,7 +7,7 @@
 
         <variable
             name="viewmodel"
-            type="com.example.speedcurve.view.main.MainViewModel" />
+            type="com.example.speedcurve.viewmodel.MainViewModel" />
 
         <variable
             name="handlers"
