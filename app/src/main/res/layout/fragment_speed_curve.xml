@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewmodel"
+            type="com.example.speedcurve.view.main.MainViewModel" />
+
+        <variable
+            name="handlers"
+            type="com.example.speedcurve.view.speedcurve.SpeedCurveFragment" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".view.speedcurve.SpeedCurveFragment">
+
+        <EditText
+            android:id="@+id/speed_1_edt"
+            style="@style/editTextStyle"
+            android:layout_marginTop="@dimen/default_margin"
+            android:autofillHints="decimalNumber"
+            android:inputType="numberDecimal|numberSigned"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/speed_1_tv"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="LabelFor,RtlSymmetry" />
+
+        <EditText
+            android:id="@+id/speed_2_edt"
+            style="@style/editTextStyle"
+            android:autofillHints="decimalNumber"
+            android:inputType="numberDecimal|numberSigned"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/speed_2_tv"
+            app:layout_constraintTop_toBottomOf="@+id/speed_1_edt"
+            tools:ignore="LabelFor,RtlSymmetry" />
+
+        <EditText
+            android:id="@+id/speed_3_edt"
+            style="@style/editTextStyle"
+            android:layout_marginTop="@dimen/default_margin"
+            android:layout_marginBottom="@dimen/default_margin"
+            android:autofillHints="decimalNumber"
+            android:inputType="numberDecimal|numberSigned"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/speed_3_tv"
+            app:layout_constraintTop_toBottomOf="@+id/index_2_edt"
+            app:layout_constraintVertical_bias="0.0"
+            tools:ignore="LabelFor,RtlSymmetry" />
+
+
+        <EditText
+            android:id="@+id/index_2_edt"
+            style="@style/editTextStyle"
+            android:autofillHints="integerIndex"
+            android:inputType="numberSigned"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/index_2_tv"
+            app:layout_constraintTop_toBottomOf="@+id/speed_2_edt"
+            tools:ignore="LabelFor,RtlSymmetry" />
+
+        <TextView
+            android:id="@+id/speed_1_tv"
+            style="@style/speedCurveTextViewStyle"
+            android:layout_marginTop="@dimen/default_margin"
+            android:text="@string/speed_pointer_1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/speed_2_tv"
+            style="@style/speedCurveTextViewStyle"
+            android:text="@string/speed_pointer_2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/speed_1_tv" />
+
+        <TextView
+            android:id="@+id/index_2_tv"
+            style="@style/speedCurveTextViewStyle"
+            android:text="@string/index_pointer_2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/speed_2_tv" />
+
+        <TextView
+            android:id="@+id/speed_3_tv"
+            style="@style/speedCurveTextViewStyle"
+            android:layout_marginBottom="@dimen/default_margin"
+            android:text="@string/speed_pointer_3"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/index_2_tv"
+            app:layout_constraintVertical_bias="0.0" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

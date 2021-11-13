@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Speed Curve</string>
+    //Buttons
+    <string name="play_btn_text">Play</string>
+    <string name="pause_btn_text">Pause</string>
+    <string name="speed_curve_btn_name">Speed Curve Button</string>
+    //Image content descriptions
+    <string name="stream_image">Image Stream</string>
+    //Toast warnings
+    <string name="speed_curve_input_error">All speed values must be between 0.2 – 5.0 and index value must be between 0 – 99!</string>
+    //Speed curve text views
+    <string name="speed_pointer_1">Speed of Pointer 1</string>
+    <string name="speed_pointer_2">Speed of Pointer 2</string>
+    <string name="speed_pointer_3">Speed of Pointer 3</string>
+    <string name="index_pointer_2">Index of Pointer 2</string>
+</resources>

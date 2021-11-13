@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewmodel"
+            type="com.example.speedcurve.view.main.MainViewModel" />
+
+        <variable
+            name="handlers"
+            type="com.example.speedcurve.view.slider.SliderFragment" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".view.slider.SliderFragment">
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/slider"
+            style="@style/Widget.App.Slider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/default_margin"
+            android:layout_marginTop="@dimen/default_margin"
+            android:scrollbarThumbHorizontal="@style/Widget.MaterialComponents.Slider"
+            android:stepSize="1"
+            android:valueTo="99"
+            app:labelBehavior="withinBounds"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/current_media_frame_tv"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/current_media_frame_tv"
+            style="@style/sliderTextViewStyle"
+            android:text="@{`Current media frame: ` + viewmodel.currentMediaFrameText??`0`}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/slider" />
+
+        <TextView
+            android:id="@+id/current_project_frame_tv"
+            style="@style/sliderTextViewStyle"
+            android:text="@{`Current project frame: ` + viewmodel.currentProjectFrameText??`0`}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/current_media_frame_tv" />
+
+        <Button
+            android:id="@+id/speed_curve_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="64dp"
+            android:layout_marginBottom="@dimen/default_margin"
+            android:text="@string/speed_curve_btn_name"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/current_project_frame_tv" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
