@@ -6,7 +6,7 @@ Live Data/Observable
 
 Dependency Injection with Dagger/Hilt
 
-Data/View Binging
+Data/View Binding
 
 Kotlin Flow
 
