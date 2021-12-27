@@ -69,23 +69,21 @@ class FrameInfoGenerator @Inject constructor() {
         return printNumberList
     }
 
-
-
     fun generateFrames(
-        startPosition: Int,
-        projectFrames: IntArray
+        currentProjectFrameValue: Int,
+        mediaFrames: IntArray
     ): Flow<FrameInfo> = flow {
 
-        for (i in startPosition until projectFrames.size) {
+        for (i in currentProjectFrameValue until mediaFrames.size) {
 
-            emit(FrameInfo(i, projectFrames[i]))
+            emit(FrameInfo(i, mediaFrames[i]))
             delay(Constants.DELAY_TIME)
         }
     }
 
     /**
-      * This function removes the duplicate middle element that is common between 2 ranges.
-      * @param arr Array of which first item to be removed
+     * This function removes the duplicate middle element that is common between 2 ranges.
+     * @param arr array of which first item to be removed
      **/
     private fun removeTheFirstElement(arr: FloatArray): FloatArray {
         return (arr.indices)
@@ -98,7 +96,6 @@ class FrameInfoGenerator @Inject constructor() {
         initialSpeed: Float, currentIndex: Int,
         y1: Float, y0: Float, x1: Int, x0: Int
     ): Float {
-        return initialSpeed + currentIndex * ((y1 - y0) / (x1 - x0))
+        return initialSpeed + (currentIndex + 1) * ((y1 - y0) / (x1 - x0))
     }
-
 }

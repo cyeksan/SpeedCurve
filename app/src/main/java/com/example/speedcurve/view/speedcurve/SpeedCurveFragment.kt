@@ -26,6 +26,7 @@ class SpeedCurveFragment : Fragment() {
         binding?.viewmodel = viewModel
         return binding?.root
     }
+
     companion object {
         fun newInstance() = SpeedCurveFragment()
     }
@@ -49,9 +50,7 @@ class SpeedCurveFragment : Fragment() {
                     binding?.index2Edt?.text.toString().toInt()
                 )
                 setStartPositionValue(0)
-
                 setIsSpeedCurveValuesInRange(true)
-
             }
 
             // SpeedCurveFragment is disabled regardless of the validation result

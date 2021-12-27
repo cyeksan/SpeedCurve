@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.speedcurve.databinding.FragmentImagePlayBinding
-import com.example.speedcurve.util.getFrameForPosition
+import com.example.speedcurve.util.getMediaFrameValue
 import com.example.speedcurve.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -35,8 +35,8 @@ class ImagePlayFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.apply {
-            frameValue.observe(viewLifecycleOwner) {
-                binding?.imageView?.setImageResource(requireContext().getFrameForPosition(it))
+            mediaFrameValue.observe(viewLifecycleOwner) {
+                binding?.imageView?.setImageResource(requireContext().getMediaFrameValue(it))
             }
 
             buttonName.observe(viewLifecycleOwner) {

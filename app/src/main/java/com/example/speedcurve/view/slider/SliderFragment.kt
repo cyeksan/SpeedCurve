@@ -15,12 +15,13 @@ import kotlinx.coroutines.InternalCoroutinesApi
 class SliderFragment : Fragment() {
     private var binding: FragmentSliderBinding? = null
     private val viewModel: MainViewModel by activityViewModels()
-    private lateinit var mediaFramesArray : IntArray
-    private lateinit var projectFramesArray : IntArray
+    private lateinit var mediaFramesArray: IntArray
+    private lateinit var projectFramesArray: IntArray
 
     companion object {
         fun newInstance() = SliderFragment()
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -32,7 +33,7 @@ class SliderFragment : Fragment() {
             it.viewmodel = viewModel
             it.lifecycleOwner = this
             it.slider.addOnChangeListener { _, value, _ ->
-                viewModel.changeSliderPosition(value.toInt())
+                viewModel.updateCurrentMediaFrameWithSliderPosition(value.toInt())
             }
             it.speedCurveBtn.setOnClickListener {
                 viewModel.enableSpeedCurveFragment(true)
@@ -46,15 +47,14 @@ class SliderFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mediaFramesArray = viewModel.getMediaFrames(
-            viewModel.index.value!!, viewModel.speed1.value!!,
-            viewModel.speed2.value!!, viewModel.speed3.value!!)
-
-        projectFramesArray = viewModel.getProjectFrames(mediaFramesArray)
-
         viewModel.apply {
-            setMediaFrames(mediaFramesArray)
-            setProjectFrames(projectFramesArray)
+            mediaFramesArray = createMediaFrames(
+                viewModel.index.value!!, viewModel.speed1.value!!,
+                viewModel.speed2.value!!, viewModel.speed3.value!!
+            )
+
+            projectFramesArray = createProjectFrames(mediaFramesArray)
+
             setSliderMaxValue(projectFramesArray.size - 1)
 
             sliderEnabled.observe(viewLifecycleOwner) {
@@ -68,8 +68,6 @@ class SliderFragment : Fragment() {
             sliderPosition.observe(viewLifecycleOwner) {
                 viewModel.setStartPositionValue(it)
             }
-
-
         }
 
     }

@@ -25,8 +25,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private var playingJob: Job? = null
     private lateinit var speedCurveFragmentInstance: SpeedCurveFragment
-    private lateinit var mediaFrames : IntArray
-    private lateinit var projectFrames : IntArray
+    private lateinit var mediaFrames: IntArray
+    private lateinit var projectFrames: IntArray
     private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,19 +68,15 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     replaceWith(SliderFragment.newInstance())
                     binding.toolbarHome.visibility = View.INVISIBLE
-                    mediaFrames = viewModel.getMediaFrames(
+                    mediaFrames = viewModel.createMediaFrames(
                         viewModel.index.value!!, viewModel.speed1.value!!,
                         viewModel.speed2.value!!, viewModel.speed3.value!!
                     )
-                    viewModel.setMediaFrames(mediaFrames)
-                    projectFrames = viewModel.getProjectFrames(mediaFrames)
-                    viewModel.setProjectFrames(projectFrames)
-                    viewModel.startPlaying(this)
+                    projectFrames = viewModel.createProjectFrames(mediaFrames)
+                    viewModel.startPlaying()
                 }
             }
         }
-
-
     }
 
     private fun replaceWith(fragment: Fragment) {
@@ -95,7 +91,7 @@ class MainActivity : AppCompatActivity() {
 
             while (isActive) {
                 viewModel.collectImages(
-                    viewModel.startPosition.value!!
+                    viewModel.projectFrameValue.value!!
                 )
             }
         }

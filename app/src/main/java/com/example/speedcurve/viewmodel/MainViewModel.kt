@@ -42,8 +42,11 @@ class MainViewModel @Inject constructor(
     private val mutableSpeedCurveEnabled = MutableLiveData(false)
     val speedCurveEnabled: LiveData<Boolean> get() = mutableSpeedCurveEnabled
 
-    private val mutableFrameValue = MutableLiveData(0)
-    val frameValue: LiveData<Int> get() = mutableFrameValue
+    private val mutableMediaFrameValue = MutableLiveData(0)
+    val mediaFrameValue: LiveData<Int> get() = mutableMediaFrameValue
+
+    private val mutableProjectFrameValue = MutableLiveData(0)
+    val projectFrameValue: LiveData<Int> get() = mutableProjectFrameValue
 
     private val mutableIsPlaying = MutableLiveData(false)
     val isPlaying: LiveData<Boolean> get() = mutableIsPlaying
@@ -60,9 +63,6 @@ class MainViewModel @Inject constructor(
     private val mutableIndex = MutableLiveData(Constants.INITIAL_INDEX)
     val index: LiveData<Int> get() = mutableIndex
 
-    private val mutableStartPosition = MutableLiveData(0)
-    val startPosition: LiveData<Int> get() = mutableStartPosition
-
     private val mutableMediaFrames = MutableLiveData(intArrayOf())
     private val mediaFrames: LiveData<IntArray> get() = mutableMediaFrames
 
@@ -71,30 +71,27 @@ class MainViewModel @Inject constructor(
 
     private val mutableIsSpeedCurveValuesInRange = MutableLiveData(false)
 
+    /** This function collects the media frames from repository **/
     suspend fun collectImages(
-        startPosition: Int,
+        currentProjectFrameValue: Int,
     ) {
-        repository.generateFrames(startPosition, mediaFrames.value!!)
+        repository.generateFrames(currentProjectFrameValue, mediaFrames.value!!)
             .flowOn(Dispatchers.Default).collect {
-                if (startPosition == projectFrames.value?.size?.minus(1)) {
+                if (currentProjectFrameValue == projectFrames.value?.size?.minus(1)) {
                     // When it comes to the last value, it starts from 0th project frame.
-                    mutableStartPosition.postValue(0)
+                    mutableProjectFrameValue.postValue(0)
                 } else {
                     // It is updated continuously, so if it is paused, it can start from the paused index.
-                    mutableStartPosition.postValue(it.index)
+                    mutableProjectFrameValue.postValue(it.index)
                 }
-                mutableFrameValue.postValue(it.value)
+                mutableMediaFrameValue.postValue(it.value) // current media frame is continuously updated.
             }
     }
 
-    fun setProjectFrames(projectFrames: IntArray) {
-        mutableProjectFrames.postValue(projectFrames)
-    }
-
-    fun setMediaFrames(mediaFrames: IntArray) {
-        mutableMediaFrames.postValue(mediaFrames)
-    }
-
+    /** This function is triggered when play/pause button is clicked.
+     * If the button is clicked when it is played, it is paused so mutableIsPlaying is set to false
+     * and button text is set to "Play" (and vice versa)
+     * @param context **/
     fun togglePlaying(context: Context) {
         if (isPlaying.value!!) {
             mutableIsPlaying.postValue(false)
@@ -106,71 +103,47 @@ class MainViewModel @Inject constructor(
         mutableSliderEnabled.value = isPlaying.value!!
     }
 
-    fun changeSliderPosition(position: Int) {
+    /** This function updates the current media frame according to slider position.
+     * Also, current media frame text and current project frame text are updated accordingly.
+     * @param position position of the slider **/
+    fun updateCurrentMediaFrameWithSliderPosition(position: Int) {
         mutableSliderPosition.postValue(position)
-        mutableCurrentProjectFrameText.postValue(position.toString())
-        try {
-            mutableFrameValue.postValue(
-                mediaFrames.value?.get(position)
-            )
-            mutableCurrentMediaFrameText.postValue(
-                mediaFrames.value?.get(position).toString()
-            )
+        mutableMediaFrameValue.postValue(
+            mediaFrames.value?.get(position)
+        )
+        mutableCurrentMediaFrameText.postValue(
+            mediaFrames.value?.get(position).toString()
+        )
+        mutableCurrentProjectFrameText.postValue(
+            projectFrames.value?.get(position).toString()
+        )
 
-        } catch (ex: IndexOutOfBoundsException) {
-            ex.printStackTrace()
-        }
     }
 
-    fun enableSpeedCurveFragment(isEnabled: Boolean) {
-        mutableSpeedCurveEnabled.postValue(isEnabled)
-    }
-
-    fun setSpeedAndIndexValues(speed1: Float, speed2: Float, speed3: Float, index: Int) {
-        mutableSpeed1.postValue(speed1)
-        mutableSpeed2.postValue(speed2)
-        mutableSpeed3.postValue(speed3)
-        if (index == 0) {
-            mutableIndex.postValue(index + 1)
-        } else {
-            mutableIndex.postValue(index)
-        }
-    }
-
-    fun setStartPositionValue(startPosition: Int) {
-        mutableStartPosition.postValue(startPosition)
-    }
-
-    fun setSliderMaxValue(sliderMaxValue: Int) {
-        mutableSliderMaxValue.postValue(sliderMaxValue)
-    }
-
-    fun setIsNotFirstLaunch() {
-        mutableIsFirstLaunch.postValue(false)
-    }
-
-    fun startPlaying(context: Context) {
+    /** This function sets isPlaying live variable to true.
+     * Also, current media frame text and current project frame text are restarted from 0. **/
+    fun startPlaying() {
+        // This if condition prevents to start playing without button click in the app launch
         if (!mutableIsFirstLaunch.value!! && mutableIsSpeedCurveValuesInRange.value!!) {
             mutableIsPlaying.postValue(true)
-            mutableButtonName.postValue(context.getString(R.string.pause_btn_text))
-            mutableSliderEnabled.postValue(false)
+            mutableCurrentProjectFrameText.postValue(0.toString())
+            mutableCurrentMediaFrameText.postValue(0.toString())
         }
-
-        mutableCurrentProjectFrameText.postValue(0.toString())
-        mutableCurrentMediaFrameText.postValue(0.toString())
     }
 
-    fun setIsSpeedCurveValuesInRange(isSpeedCurveValuesInRange: Boolean) {
-        mutableIsSpeedCurveValuesInRange.postValue(isSpeedCurveValuesInRange)
-    }
-
+    /** This function validates if the values of EdiTexts in SpeedCurveFragment
+     * are set correctly by the user.
+     * @param speed1 speed of pointer 1
+     * @param speed2 speed of pointer 2
+     * @param speed3 speed of pointer 3
+     * @param index2 index of pointer 2 **/
     fun validateEditTextValue(
         speed1: String,
         speed2: String,
         speed3: String,
         index2: String,
         work: () -> Unit
-    ) : Boolean{
+    ): Boolean {
         if (speed1.isNotEmpty() && speed2.isNotEmpty() && speed3.isNotEmpty() && index2.isNotEmpty()) {
             if (speed1.toFloat() in Constants.SPEED_LOWER_LIMIT..Constants.SPEED_HIGHER_LIMIT &&
                 speed2.toFloat() in Constants.SPEED_LOWER_LIMIT..Constants.SPEED_HIGHER_LIMIT &&
@@ -184,7 +157,18 @@ class MainViewModel @Inject constructor(
         return false
     }
 
-    fun getMediaFrames(index2: Int, speed1: Float, speed2: Float, speed3: Float): IntArray {
+    fun enableSpeedCurveFragment(isEnabled: Boolean) {
+        mutableSpeedCurveEnabled.postValue(isEnabled)
+    }
+
+    /** This function creates and returns an array that includes elements. Each element is repeated
+     * by the times of print number of elements.
+     * @param index2 index of pointer 2
+     * @param speed1 speed of pointer 1
+     * @param speed2 speed of pointer 2
+     * @param speed3 speed of pointer 3
+     * @return the media frames array created **/
+    fun createMediaFrames(index2: Int, speed1: Float, speed2: Float, speed3: Float): IntArray {
         val mediaFrames = arrayListOf<Int>()
 
         for ((index, value) in repository.createListOfPrintNumbersOfFrames(
@@ -197,16 +181,45 @@ class MainViewModel @Inject constructor(
                 mediaFrames.add(index)
             }
         }
+        mutableMediaFrames.postValue(mediaFrames.toIntArray())
         return mediaFrames.toIntArray()
     }
 
-    fun getProjectFrames(mediaFrames: IntArray): IntArray {
+    /** This function transforms the media frame array into a project frame array.
+     * @param mediaFrames media frame array created
+     * @return the project frames array **/
+    fun createProjectFrames(mediaFrames: IntArray): IntArray {
         val projectFrames = arrayListOf<Int>()
 
-        for(i in mediaFrames.indices) {
+        for (i in mediaFrames.indices) {
             projectFrames.add(i)
         }
+        mutableProjectFrames.postValue(projectFrames.toIntArray())
         return projectFrames.toIntArray()
+    }
+
+    fun setSpeedAndIndexValues(speed1: Float, speed2: Float, speed3: Float, index: Int) {
+        mutableSpeed1.postValue(speed1)
+        mutableSpeed2.postValue(speed2)
+        mutableSpeed3.postValue(speed3)
+        mutableIndex.postValue(index)
+        mutableIndex.postValue(index)
+    }
+
+    fun setStartPositionValue(startPosition: Int) {
+        mutableProjectFrameValue.postValue(startPosition)
+    }
+
+    fun setSliderMaxValue(sliderMaxValue: Int) {
+        mutableSliderMaxValue.postValue(sliderMaxValue)
+    }
+
+    fun setIsNotFirstLaunch() {
+        mutableIsFirstLaunch.postValue(false)
+    }
+
+    fun setIsSpeedCurveValuesInRange(isSpeedCurveValuesInRange: Boolean) {
+        mutableIsSpeedCurveValuesInRange.postValue(isSpeedCurveValuesInRange)
     }
 
 }
