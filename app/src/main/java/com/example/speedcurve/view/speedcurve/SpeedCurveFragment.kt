@@ -14,7 +14,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class SpeedCurveFragment : Fragment() {
-    var binding: FragmentSpeedCurveBinding? = null
+    private var binding: FragmentSpeedCurveBinding? = null
 
     private val viewModel: MainViewModel by activityViewModels()
     override fun onCreateView(

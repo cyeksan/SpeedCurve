@@ -3,7 +3,6 @@ package com.example.speedcurve.util
 import android.content.Context
 import android.widget.Toast
 
-
 fun Context.getFrameForPosition(position: Int): Int {
     return resources.getIdentifier(
         "f_$position", "drawable",

@@ -1,6 +1,5 @@
 package com.example.speedcurve.repository
 
-import android.util.Log
 import com.example.speedcurve.model.FrameInfo
 import com.example.speedcurve.util.Constants
 import kotlinx.coroutines.delay
@@ -85,8 +84,8 @@ class FrameInfoGenerator @Inject constructor() {
     }
 
     /**
-     * @param{}
-     This function removes the duplicate middle element that is common between 2 ranges
+      * This function removes the duplicate middle element that is common between 2 ranges.
+      * @param arr Array of which first item to be removed
      **/
     private fun removeTheFirstElement(arr: FloatArray): FloatArray {
         return (arr.indices)

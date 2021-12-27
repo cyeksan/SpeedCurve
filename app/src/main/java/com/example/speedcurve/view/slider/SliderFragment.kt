@@ -15,7 +15,9 @@ import kotlinx.coroutines.InternalCoroutinesApi
 class SliderFragment : Fragment() {
     private var binding: FragmentSliderBinding? = null
     private val viewModel: MainViewModel by activityViewModels()
+    private lateinit var mediaFramesArray : IntArray
     private lateinit var projectFramesArray : IntArray
+
     companion object {
         fun newInstance() = SliderFragment()
     }
@@ -44,11 +46,14 @@ class SliderFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        projectFramesArray = viewModel.getProjectFrames(
+        mediaFramesArray = viewModel.getMediaFrames(
             viewModel.index.value!!, viewModel.speed1.value!!,
             viewModel.speed2.value!!, viewModel.speed3.value!!)
 
+        projectFramesArray = viewModel.getProjectFrames(mediaFramesArray)
+
         viewModel.apply {
+            setMediaFrames(mediaFramesArray)
             setProjectFrames(projectFramesArray)
             setSliderMaxValue(projectFramesArray.size - 1)
 

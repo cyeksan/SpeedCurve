@@ -25,8 +25,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private var playingJob: Job? = null
     private lateinit var speedCurveFragmentInstance: SpeedCurveFragment
-    private lateinit var projectFramesArray: IntArray
-
+    private lateinit var mediaFrames : IntArray
+    private lateinit var projectFrames : IntArray
     private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,12 +68,13 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     replaceWith(SliderFragment.newInstance())
                     binding.toolbarHome.visibility = View.INVISIBLE
-                    viewModel.setProjectFrames(
-                        viewModel.getProjectFrames(
-                            viewModel.index.value!!, viewModel.speed1.value!!,
-                            viewModel.speed2.value!!, viewModel.speed3.value!!
-                        )
+                    mediaFrames = viewModel.getMediaFrames(
+                        viewModel.index.value!!, viewModel.speed1.value!!,
+                        viewModel.speed2.value!!, viewModel.speed3.value!!
                     )
+                    viewModel.setMediaFrames(mediaFrames)
+                    projectFrames = viewModel.getProjectFrames(mediaFrames)
+                    viewModel.setProjectFrames(projectFrames)
                     viewModel.startPlaying(this)
                 }
             }

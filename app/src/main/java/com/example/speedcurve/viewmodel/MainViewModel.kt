@@ -1,17 +1,14 @@
 package com.example.speedcurve.viewmodel
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.speedcurve.R
 import com.example.speedcurve.repository.FrameInfoGenerator
 import com.example.speedcurve.util.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
@@ -66,15 +63,18 @@ class MainViewModel @Inject constructor(
     private val mutableStartPosition = MutableLiveData(0)
     val startPosition: LiveData<Int> get() = mutableStartPosition
 
+    private val mutableMediaFrames = MutableLiveData(intArrayOf())
+    private val mediaFrames: LiveData<IntArray> get() = mutableMediaFrames
+
     private val mutableProjectFrames = MutableLiveData(intArrayOf())
-    val projectFrames: LiveData<IntArray> get() = mutableProjectFrames
+    private val projectFrames: LiveData<IntArray> get() = mutableProjectFrames
 
     private val mutableIsSpeedCurveValuesInRange = MutableLiveData(false)
 
     suspend fun collectImages(
         startPosition: Int,
     ) {
-        repository.generateFrames(startPosition, projectFrames.value!!)
+        repository.generateFrames(startPosition, mediaFrames.value!!)
             .flowOn(Dispatchers.Default).collect {
                 if (startPosition == projectFrames.value?.size?.minus(1)) {
                     // When it comes to the last value, it starts from 0th project frame.
@@ -89,6 +89,10 @@ class MainViewModel @Inject constructor(
 
     fun setProjectFrames(projectFrames: IntArray) {
         mutableProjectFrames.postValue(projectFrames)
+    }
+
+    fun setMediaFrames(mediaFrames: IntArray) {
+        mutableMediaFrames.postValue(mediaFrames)
     }
 
     fun togglePlaying(context: Context) {
@@ -107,10 +111,10 @@ class MainViewModel @Inject constructor(
         mutableCurrentProjectFrameText.postValue(position.toString())
         try {
             mutableFrameValue.postValue(
-                projectFrames.value?.get(position)
+                mediaFrames.value?.get(position)
             )
             mutableCurrentMediaFrameText.postValue(
-                projectFrames.value?.get(position).toString()
+                mediaFrames.value?.get(position).toString()
             )
 
         } catch (ex: IndexOutOfBoundsException) {
@@ -154,7 +158,6 @@ class MainViewModel @Inject constructor(
 
         mutableCurrentProjectFrameText.postValue(0.toString())
         mutableCurrentMediaFrameText.postValue(0.toString())
-
     }
 
     fun setIsSpeedCurveValuesInRange(isSpeedCurveValuesInRange: Boolean) {
@@ -178,12 +181,11 @@ class MainViewModel @Inject constructor(
                 return true
             }
         }
-
         return false
     }
 
-    fun getProjectFrames(index2: Int, speed1: Float, speed2: Float, speed3: Float): IntArray {
-        val projectFrames = arrayListOf<Int>()
+    fun getMediaFrames(index2: Int, speed1: Float, speed2: Float, speed3: Float): IntArray {
+        val mediaFrames = arrayListOf<Int>()
 
         for ((index, value) in repository.createListOfPrintNumbersOfFrames(
             index2,
@@ -192,10 +194,18 @@ class MainViewModel @Inject constructor(
             speed3
         ).withIndex()) {
             repeat(value) {
-                projectFrames.add(index)
+                mediaFrames.add(index)
             }
         }
-        Log.i("Project frames", projectFrames.toIntArray().contentToString())
+        return mediaFrames.toIntArray()
+    }
+
+    fun getProjectFrames(mediaFrames: IntArray): IntArray {
+        val projectFrames = arrayListOf<Int>()
+
+        for(i in mediaFrames.indices) {
+            projectFrames.add(i)
+        }
         return projectFrames.toIntArray()
     }
 
