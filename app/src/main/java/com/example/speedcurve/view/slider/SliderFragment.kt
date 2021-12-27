@@ -65,9 +65,6 @@ class SliderFragment : Fragment() {
                 binding?.slider?.valueTo = it?.toFloat()!!
             }
 
-            sliderPosition.observe(viewLifecycleOwner) {
-                viewModel.setCurrentProjectFrameValue(it)
-            }
         }
 
     }

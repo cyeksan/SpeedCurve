@@ -30,9 +30,6 @@ class MainViewModel @Inject constructor(
     private val mutableCurrentProjectFrameText = MutableLiveData(0.toString())
     val currentProjectFrameText: LiveData<String> get() = mutableCurrentProjectFrameText
 
-    private val mutableSliderPosition = MutableLiveData(0)
-    val sliderPosition: LiveData<Int> get() = mutableSliderPosition
-
     private val mutableSliderMaxValue = MutableLiveData(Constants.ITEM_SIZE - 1)
     val sliderMaxValue: LiveData<Int> get() = mutableSliderMaxValue
 
@@ -107,9 +104,11 @@ class MainViewModel @Inject constructor(
      * Also, current media frame text and current project frame text are updated accordingly.
      * @param position position of the slider **/
     fun updateCurrentMediaFrameWithSliderPosition(position: Int) {
-        mutableSliderPosition.postValue(position)
         mutableMediaFrameValue.postValue(
             mediaFrames.value?.get(position)
+        )
+        mutableProjectFrameValue.postValue(
+            projectFrames.value?.get(position)
         )
         mutableCurrentMediaFrameText.postValue(
             mediaFrames.value?.get(position).toString()
