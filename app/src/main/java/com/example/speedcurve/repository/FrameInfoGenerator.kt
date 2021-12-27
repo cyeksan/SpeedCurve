@@ -1,5 +1,6 @@
 package com.example.speedcurve.repository
 
+import android.util.Log
 import com.example.speedcurve.model.FrameInfo
 import com.example.speedcurve.util.Constants
 import kotlinx.coroutines.delay
@@ -12,36 +13,6 @@ import javax.inject.Singleton
 
 @Singleton
 class FrameInfoGenerator @Inject constructor() {
-    private fun createSpeedArrayOfFirstRange(
-        index2: Int,
-        speed1: Float,
-        speed2: Float
-    ): FloatArray {
-        val index1 = 0
-        val firstRangeSpeedArray = FloatArray(index2 - index1 + 1)
-
-        for (i in 0..index2) {
-            firstRangeSpeedArray[i] = linearInterpolation(speed1, i, speed2, speed1, index2, index1)
-        }
-
-        return firstRangeSpeedArray
-    }
-
-    private fun createSpeedArrayOfSecondRange(
-        index2: Int,
-        speed2: Float,
-        speed3: Float
-    ): FloatArray {
-        val index3 = Constants.ITEM_SIZE
-        val secondRangeSpeedArray = FloatArray(index3 - index2)
-
-        for (i in index2 + 1..index3) {
-            secondRangeSpeedArray[i - (index2 + 1)] =
-                linearInterpolation(speed2, (i - index2), speed3, speed2, index3, index2)
-        }
-
-        return secondRangeSpeedArray
-    }
 
     private fun createSpeedArrayOfFrames(
         index2: Int,
@@ -49,32 +20,27 @@ class FrameInfoGenerator @Inject constructor() {
         speed2: Float,
         speed3: Float
     ): FloatArray {
-        // Since the mid value is included in both first range and second range, it is removed
-        // from the second one
-        return createSpeedArrayOfFirstRange(index2, speed1, speed2)
-            .plus(removeTheFirstElement(createSpeedArrayOfSecondRange(index2, speed2, speed3)))
-    }
-
-    private fun createArrayOfFrameDisplayTime(
-        index2: Int,
-        speed1: Float,
-        speed2: Float,
-        speed3: Float
-    ): FloatArray {
         val index1 = 0
-        val index3 = Constants.ITEM_SIZE - 1
-        var frameDisplayTime: Float
-        val frameDisplayTimeArray = FloatArray(index3 - index1 + 1)
+        val index3 = Constants.ITEM_SIZE
 
-        for ((index, value) in createSpeedArrayOfFrames(index2, speed1, speed2, speed3).toList()
-            .withIndex()) {
-            frameDisplayTime = 1 / value
-            frameDisplayTimeArray[index] = frameDisplayTime
+        val firstRangeSpeedArray = FloatArray(index2 - index1 + 1)
+        val secondRangeSpeedArray = FloatArray(index3 - index2)
+
+        // Create first range
+        for (i in 0..index2) {
+            firstRangeSpeedArray[i] = linearInterpolation(speed1, i, speed2, speed1, index2, index1)
         }
-        return frameDisplayTimeArray
+
+        // Create second range
+        for (i in index2 + 1..index3) {
+            secondRangeSpeedArray[i - (index2 + 1)] =
+                linearInterpolation(speed2, (i - index2), speed3, speed2, index3, index2)
+        }
+
+        return firstRangeSpeedArray.plus(removeTheFirstElement(secondRangeSpeedArray))
     }
 
-    private fun createListOfPrintNumbersOfFrames(
+    fun createListOfPrintNumbersOfFrames(
         index2: Int,
         speed1: Float,
         speed2: Float,
@@ -84,9 +50,9 @@ class FrameInfoGenerator @Inject constructor() {
 
         var remainder = 0.0f
 
-        for (frameDisplayTime in createArrayOfFrameDisplayTime(index2, speed1, speed2, speed3)) {
-            remainder += frameDisplayTime % 1
-            var division: Int = (frameDisplayTime / 1).toInt()
+        for (speedValue in createSpeedArrayOfFrames(index2, speed1, speed2, speed3).toList()) {
+            remainder += (1 / speedValue) % 1 // 1 / speedValue is frame display time
+            var division: Int = ((1 / speedValue) / 1).toInt()
 
             if ((division == 1 && remainder > 0.0f) || remainder >= 1.0f) {
                 remainder %= 1.0f
@@ -104,31 +70,12 @@ class FrameInfoGenerator @Inject constructor() {
         return printNumberList
     }
 
-    fun createProjectFrames(index2: Int, speed1: Float, speed2: Float, speed3: Float): IntArray {
-        val projectFrames = arrayListOf<Int>()
 
-        for ((index, value) in createListOfPrintNumbersOfFrames(
-            index2,
-            speed1,
-            speed2,
-            speed3
-        ).withIndex()) {
-            repeat(value) {
-                projectFrames.add(index)
-            }
-        }
-        return projectFrames.toIntArray()
-    }
 
     fun generateFrames(
         startPosition: Int,
-        speed1: Float,
-        speed2: Float,
-        speed3: Float,
-        index2: Int
+        projectFrames: IntArray
     ): Flow<FrameInfo> = flow {
-
-        val projectFrames = createProjectFrames(index2, speed1, speed2, speed3)
 
         for (i in startPosition until projectFrames.size) {
 
@@ -137,6 +84,10 @@ class FrameInfoGenerator @Inject constructor() {
         }
     }
 
+    /**
+     * @param{}
+     This function removes the duplicate middle element that is common between 2 ranges
+     **/
     private fun removeTheFirstElement(arr: FloatArray): FloatArray {
         return (arr.indices)
             .filter { i: Int -> i != 0 }
@@ -150,4 +101,5 @@ class FrameInfoGenerator @Inject constructor() {
     ): Float {
         return initialSpeed + currentIndex * ((y1 - y0) / (x1 - x0))
     }
+
 }

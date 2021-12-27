@@ -1,14 +1,17 @@
 package com.example.speedcurve.viewmodel
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.speedcurve.R
 import com.example.speedcurve.repository.FrameInfoGenerator
 import com.example.speedcurve.util.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
@@ -63,18 +66,17 @@ class MainViewModel @Inject constructor(
     private val mutableStartPosition = MutableLiveData(0)
     val startPosition: LiveData<Int> get() = mutableStartPosition
 
+    private val mutableProjectFrames = MutableLiveData(intArrayOf())
+    val projectFrames: LiveData<IntArray> get() = mutableProjectFrames
+
     private val mutableIsSpeedCurveValuesInRange = MutableLiveData(false)
 
     suspend fun collectImages(
-        speed: Float,
         startPosition: Int,
-        speed2: Float,
-        speed3: Float,
-        index: Int
     ) {
-        repository.generateFrames(startPosition, speed, speed2, speed3, index)
+        repository.generateFrames(startPosition, projectFrames.value!!)
             .flowOn(Dispatchers.Default).collect {
-                if (startPosition == getProjectFrames(speed, index, speed2, speed3).size - 1) {
+                if (startPosition == projectFrames.value?.size?.minus(1)) {
                     // When it comes to the last value, it starts from 0th project frame.
                     mutableStartPosition.postValue(0)
                 } else {
@@ -83,6 +85,10 @@ class MainViewModel @Inject constructor(
                 }
                 mutableFrameValue.postValue(it.value)
             }
+    }
+
+    fun setProjectFrames(projectFrames: IntArray) {
+        mutableProjectFrames.postValue(projectFrames)
     }
 
     fun togglePlaying(context: Context) {
@@ -101,16 +107,10 @@ class MainViewModel @Inject constructor(
         mutableCurrentProjectFrameText.postValue(position.toString())
         try {
             mutableFrameValue.postValue(
-                getProjectFrames(
-                    speed1.value!!, index.value!!,
-                    speed2.value!!, speed3.value!!
-                )[position]
+                projectFrames.value?.get(position)
             )
             mutableCurrentMediaFrameText.postValue(
-                getProjectFrames(
-                    speed1.value!!, index.value!!,
-                    speed2.value!!, speed3.value!!
-                )[position].toString()
+                projectFrames.value?.get(position).toString()
             )
 
         } catch (ex: IndexOutOfBoundsException) {
@@ -151,6 +151,7 @@ class MainViewModel @Inject constructor(
             mutableButtonName.postValue(context.getString(R.string.pause_btn_text))
             mutableSliderEnabled.postValue(false)
         }
+
         mutableCurrentProjectFrameText.postValue(0.toString())
         mutableCurrentMediaFrameText.postValue(0.toString())
 
@@ -159,9 +160,6 @@ class MainViewModel @Inject constructor(
     fun setIsSpeedCurveValuesInRange(isSpeedCurveValuesInRange: Boolean) {
         mutableIsSpeedCurveValuesInRange.postValue(isSpeedCurveValuesInRange)
     }
-
-    fun getProjectFrames(speed: Float, index: Int, speed2: Float, speed3: Float) =
-        repository.createProjectFrames(index, speed, speed2, speed3)
 
     fun validateEditTextValue(
         speed1: String,
@@ -183,4 +181,22 @@ class MainViewModel @Inject constructor(
 
         return false
     }
+
+    fun getProjectFrames(index2: Int, speed1: Float, speed2: Float, speed3: Float): IntArray {
+        val projectFrames = arrayListOf<Int>()
+
+        for ((index, value) in repository.createListOfPrintNumbersOfFrames(
+            index2,
+            speed1,
+            speed2,
+            speed3
+        ).withIndex()) {
+            repeat(value) {
+                projectFrames.add(index)
+            }
+        }
+        Log.i("Project frames", projectFrames.toIntArray().contentToString())
+        return projectFrames.toIntArray()
+    }
+
 }

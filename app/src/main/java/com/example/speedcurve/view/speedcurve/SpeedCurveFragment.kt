@@ -32,6 +32,8 @@ class SpeedCurveFragment : Fragment() {
 
     fun validateAndSetEnteredValues() {
         val result: Boolean
+
+
         viewModel.apply {
             result = validateEditTextValue(
                 binding?.speed1Edt?.text.toString(),
@@ -47,10 +49,14 @@ class SpeedCurveFragment : Fragment() {
                     binding?.index2Edt?.text.toString().toInt()
                 )
                 setStartPositionValue(0)
+
                 setIsSpeedCurveValuesInRange(true)
+
             }
+
             // SpeedCurveFragment is disabled regardless of the validation result
             enableSpeedCurveFragment(false)
+
         }
 
         // If validation is not successful, a toast message is shown

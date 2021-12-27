@@ -15,7 +15,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 class SliderFragment : Fragment() {
     private var binding: FragmentSliderBinding? = null
     private val viewModel: MainViewModel by activityViewModels()
-
+    private lateinit var projectFramesArray : IntArray
     companion object {
         fun newInstance() = SliderFragment()
     }
@@ -23,13 +23,6 @@ class SliderFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        viewModel.setSliderMaxValue(
-            viewModel.getProjectFrames(
-                viewModel.speed1.value!!, viewModel.index.value!!,
-                viewModel.speed2.value!!, viewModel.speed3.value!!
-            ).size - 1
-        )
 
         binding = FragmentSliderBinding.inflate(layoutInflater, container, false)
         binding?.let {
@@ -51,7 +44,13 @@ class SliderFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        projectFramesArray = viewModel.getProjectFrames(
+            viewModel.index.value!!, viewModel.speed1.value!!,
+            viewModel.speed2.value!!, viewModel.speed3.value!!)
+
         viewModel.apply {
+            setProjectFrames(projectFramesArray)
+            setSliderMaxValue(projectFramesArray.size - 1)
 
             sliderEnabled.observe(viewLifecycleOwner) {
                 binding?.slider?.isEnabled = it
@@ -65,7 +64,9 @@ class SliderFragment : Fragment() {
                 viewModel.setStartPositionValue(it)
             }
 
+
         }
+
     }
 
     override fun onDetach() {

@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private var playingJob: Job? = null
     private lateinit var speedCurveFragmentInstance: SpeedCurveFragment
+    private lateinit var projectFramesArray: IntArray
 
     private val viewModel: MainViewModel by viewModels()
 
@@ -47,7 +48,9 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.let {
             it.isPlaying.observe(this) { _isPlaying ->
+
                 playingJob?.cancel()
+
                 if (_isPlaying) {
                     playingJob =
                         createNewPlayJob() // If current state is 'playing', new job is created
@@ -65,10 +68,18 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     replaceWith(SliderFragment.newInstance())
                     binding.toolbarHome.visibility = View.INVISIBLE
+                    viewModel.setProjectFrames(
+                        viewModel.getProjectFrames(
+                            viewModel.index.value!!, viewModel.speed1.value!!,
+                            viewModel.speed2.value!!, viewModel.speed3.value!!
+                        )
+                    )
                     viewModel.startPlaying(this)
                 }
             }
         }
+
+
     }
 
     private fun replaceWith(fragment: Fragment) {
@@ -78,11 +89,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun createNewPlayJob(): Job {
+
         return lifecycleScope.launch {
+
             while (isActive) {
                 viewModel.collectImages(
-                    viewModel.speed1.value!!, viewModel.startPosition.value!!,
-                    viewModel.speed2.value!!, viewModel.speed3.value!!, viewModel.index.value!!
+                    viewModel.startPosition.value!!
                 )
             }
         }
