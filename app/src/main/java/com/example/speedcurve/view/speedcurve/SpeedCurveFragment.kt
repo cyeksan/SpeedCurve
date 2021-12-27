@@ -49,7 +49,7 @@ class SpeedCurveFragment : Fragment() {
                     binding?.speed3Edt?.text.toString().toFloat(),
                     binding?.index2Edt?.text.toString().toInt()
                 )
-                setStartPositionValue(0)
+                setCurrentProjectFrameValue(0)
                 setIsSpeedCurveValuesInRange(true)
             }
 

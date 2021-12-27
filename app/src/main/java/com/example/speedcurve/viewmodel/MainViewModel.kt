@@ -206,7 +206,7 @@ class MainViewModel @Inject constructor(
         mutableIndex.postValue(index)
     }
 
-    fun setStartPositionValue(startPosition: Int) {
+    fun setCurrentProjectFrameValue(startPosition: Int) {
         mutableProjectFrameValue.postValue(startPosition)
     }
 

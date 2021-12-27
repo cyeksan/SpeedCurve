@@ -66,7 +66,7 @@ class SliderFragment : Fragment() {
             }
 
             sliderPosition.observe(viewLifecycleOwner) {
-                viewModel.setStartPositionValue(it)
+                viewModel.setCurrentProjectFrameValue(it)
             }
         }
 
