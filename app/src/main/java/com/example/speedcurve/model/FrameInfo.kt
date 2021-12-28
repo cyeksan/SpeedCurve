@@ -5,6 +5,6 @@ package com.example.speedcurve.model
  * @param value media frame value
  * **/
 data class FrameInfo(
-    val index: Int = 0,
-    val value: Int = 0
+    var index: Int = 0,
+    var value: Int = 0
 )

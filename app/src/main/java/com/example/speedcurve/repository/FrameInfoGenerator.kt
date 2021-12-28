@@ -1,5 +1,6 @@
 package com.example.speedcurve.repository
 
+import android.util.Log
 import com.example.speedcurve.model.FrameInfo
 import com.example.speedcurve.util.Constants
 import kotlinx.coroutines.delay
@@ -12,7 +13,7 @@ import javax.inject.Singleton
 
 @Singleton
 class FrameInfoGenerator @Inject constructor() {
-
+    private val frameInfo = FrameInfo()
     private fun createSpeedArrayOfFrames(
         index2: Int,
         speed1: Float,
@@ -75,8 +76,9 @@ class FrameInfoGenerator @Inject constructor() {
     ): Flow<FrameInfo> = flow {
 
         for (i in currentProjectFrameValue until mediaFrames.size) {
-
-            emit(FrameInfo(i, mediaFrames[i]))
+            frameInfo.index = i
+            frameInfo.value = mediaFrames[i]
+            emit(frameInfo)
             delay(Constants.DELAY_TIME)
         }
     }
