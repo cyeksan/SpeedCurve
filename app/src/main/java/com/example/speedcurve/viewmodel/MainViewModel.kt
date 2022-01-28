@@ -21,7 +21,7 @@ class MainViewModel @Inject constructor(
 
     private val mutableIsFirstLaunch = MutableLiveData(true)
 
-    private val mutableButtonName = MutableLiveData<String>()
+    private val mutableButtonName = MutableLiveData(Constants.PLAY)
     val buttonName: LiveData<String> get() = mutableButtonName
 
     private val mutableCurrentMediaFrameText = MutableLiveData(0.toString())
@@ -60,21 +60,17 @@ class MainViewModel @Inject constructor(
     private val mutableIndex = MutableLiveData(Constants.INITIAL_INDEX)
     val index: LiveData<Int> get() = mutableIndex
 
-    private val mutableMediaFrames = MutableLiveData(intArrayOf())
-    private val mediaFrames: LiveData<IntArray> get() = mutableMediaFrames
-
-    private val mutableProjectFrames = MutableLiveData(intArrayOf())
-    private val projectFrames: LiveData<IntArray> get() = mutableProjectFrames
+    private val mutableProjectAndMediaFrames = MutableLiveData(hashMapOf<Int, Int>())
 
     private val mutableIsSpeedCurveValuesInRange = MutableLiveData(false)
 
-    /** This function collects the media frames from repository **/
+    /** This function collects the media and project frames from repository **/
     suspend fun collectImages(
         currentProjectFrameValue: Int,
     ) {
-        repository.generateFrames(currentProjectFrameValue, mediaFrames.value!!)
+        repository.collectFrames(currentProjectFrameValue, mutableProjectAndMediaFrames.value!!)
             .flowOn(Dispatchers.Default).collect {
-                if (currentProjectFrameValue == projectFrames.value?.size?.minus(1)) {
+                if (currentProjectFrameValue == mutableProjectAndMediaFrames.value?.size?.minus(1)) {
                     // When it comes to the last value, it starts from 0th project frame.
                     mutableProjectFrameValue.postValue(0)
                 } else {
@@ -105,16 +101,16 @@ class MainViewModel @Inject constructor(
      * @param position position of the slider **/
     fun updateCurrentMediaFrameWithSliderPosition(position: Int) {
         mutableMediaFrameValue.postValue(
-            mediaFrames.value?.get(position)
+            mutableProjectAndMediaFrames.value?.getValue(position)
         )
         mutableProjectFrameValue.postValue(
-            projectFrames.value?.get(position)
+            mutableProjectAndMediaFrames.value?.keys?.elementAt(position)
         )
         mutableCurrentMediaFrameText.postValue(
-            mediaFrames.value?.get(position).toString()
+            mutableProjectAndMediaFrames.value?.getValue(position).toString()
         )
         mutableCurrentProjectFrameText.postValue(
-            projectFrames.value?.get(position).toString()
+            mutableProjectAndMediaFrames.value?.keys?.elementAt(position).toString()
         )
 
     }
@@ -160,16 +156,21 @@ class MainViewModel @Inject constructor(
         mutableSpeedCurveEnabled.postValue(isEnabled)
     }
 
-    /** This function creates and returns an array that includes elements. Each element is repeated
-     * by the times of print number of elements.
+    /** This function creates and returns the hash map of project and media frames. Each media frame is obtained
+     * by the times of repeating print number of elements. Project frames are the index of the hash map.
      * @param index2 index of pointer 2
      * @param speed1 speed of pointer 1
      * @param speed2 speed of pointer 2
      * @param speed3 speed of pointer 3
-     * @return the media frames array created **/
-    fun createMediaFrames(index2: Int, speed1: Float, speed2: Float, speed3: Float): IntArray {
-        val mediaFrames = arrayListOf<Int>()
-
+     * @return the project and media frames hash map created **/
+    fun generateProjectAndMediaFrames(
+        index2: Int,
+        speed1: Float,
+        speed2: Float,
+        speed3: Float
+    ): HashMap<Int, Int> {
+        val hashMap: HashMap<Int, Int> = HashMap()
+        var i = 0
         for ((index, value) in repository.createListOfPrintNumbersOfFrames(
             index2,
             speed1,
@@ -177,31 +178,17 @@ class MainViewModel @Inject constructor(
             speed3
         ).withIndex()) {
             repeat(value) {
-                mediaFrames.add(index)
+                hashMap[i++] = index
             }
         }
-        mutableMediaFrames.postValue(mediaFrames.toIntArray())
-        return mediaFrames.toIntArray()
-    }
-
-    /** This function transforms the media frame array into a project frame array.
-     * @param mediaFrames media frame array created
-     * @return the project frames array **/
-    fun createProjectFrames(mediaFrames: IntArray): IntArray {
-        val projectFrames = arrayListOf<Int>()
-
-        for (i in mediaFrames.indices) {
-            projectFrames.add(i)
-        }
-        mutableProjectFrames.postValue(projectFrames.toIntArray())
-        return projectFrames.toIntArray()
+        mutableProjectAndMediaFrames.postValue(hashMap)
+        return hashMap
     }
 
     fun setSpeedAndIndexValues(speed1: Float, speed2: Float, speed3: Float, index: Int) {
         mutableSpeed1.postValue(speed1)
         mutableSpeed2.postValue(speed2)
         mutableSpeed3.postValue(speed3)
-        mutableIndex.postValue(index)
         mutableIndex.postValue(index)
     }
 
@@ -220,5 +207,4 @@ class MainViewModel @Inject constructor(
     fun setIsSpeedCurveValuesInRange(isSpeedCurveValuesInRange: Boolean) {
         mutableIsSpeedCurveValuesInRange.postValue(isSpeedCurveValuesInRange)
     }
-
 }

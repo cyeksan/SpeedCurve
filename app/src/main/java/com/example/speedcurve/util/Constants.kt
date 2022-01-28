@@ -7,5 +7,5 @@ object Constants {
     const val SPEED_HIGHER_LIMIT = 5.0F
     const val INITIAL_SPEED = 1.0F
     const val INITIAL_INDEX = 1
-
+    const val PLAY = "Play"
 }

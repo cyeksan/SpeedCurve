@@ -25,13 +25,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private var playingJob: Job? = null
     private lateinit var speedCurveFragmentInstance: SpeedCurveFragment
-    private lateinit var mediaFrames: IntArray
-    private lateinit var projectFrames: IntArray
     private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
+
         binding.toolbarHome.setNavigationOnClickListener {
             speedCurveFragmentInstance.validateAndSetEnteredValues()
         }
@@ -48,7 +47,6 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.let {
             it.isPlaying.observe(this) { _isPlaying ->
-
                 playingJob?.cancel()
 
                 if (_isPlaying) {
@@ -62,18 +60,9 @@ class MainActivity : AppCompatActivity() {
                 if (_isSpeedCurveEnabled) {
                     speedCurveFragmentInstance = SpeedCurveFragment.newInstance()
                     replaceWith(speedCurveFragmentInstance)
-                    binding.toolbarHome.visibility = View.VISIBLE
-                    viewModel.setIsNotFirstLaunch()
-                    viewModel.setIsSpeedCurveValuesInRange(false)
                 } else {
                     replaceWith(SliderFragment.newInstance())
-                    binding.toolbarHome.visibility = View.INVISIBLE
-                    mediaFrames = viewModel.createMediaFrames(
-                        viewModel.index.value!!, viewModel.speed1.value!!,
-                        viewModel.speed2.value!!, viewModel.speed3.value!!
-                    )
-                    projectFrames = viewModel.createProjectFrames(mediaFrames)
-                    viewModel.startPlaying()
+
                 }
             }
         }
@@ -83,12 +72,28 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.commit {
             replace(R.id.slider_fragment_container, fragment)
         }
+
+        when(fragment) {
+            is SpeedCurveFragment -> {
+                binding.toolbarHome.visibility = View.VISIBLE
+                viewModel.setIsNotFirstLaunch()
+                viewModel.setIsSpeedCurveValuesInRange(false)
+            }
+
+            is SliderFragment -> {
+                binding.toolbarHome.visibility = View.INVISIBLE
+                viewModel.generateProjectAndMediaFrames(
+                    viewModel.index.value!!, viewModel.speed1.value!!,
+                    viewModel.speed2.value!!, viewModel.speed3.value!!
+                )
+                viewModel.startPlaying()
+            }
+        }
     }
 
     private fun createNewPlayJob(): Job {
 
         return lifecycleScope.launch {
-
             while (isActive) {
                 viewModel.collectImages(
                     viewModel.projectFrameValue.value!!

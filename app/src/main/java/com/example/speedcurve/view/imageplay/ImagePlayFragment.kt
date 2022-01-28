@@ -14,7 +14,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class ImagePlayFragment : Fragment() {
     private var binding: FragmentImagePlayBinding? = null
-
     private val viewModel: MainViewModel by activityViewModels()
 
     override fun onCreateView(
@@ -24,9 +23,6 @@ class ImagePlayFragment : Fragment() {
         binding = FragmentImagePlayBinding.inflate(layoutInflater, container, false)
         binding?.let {
             it.viewmodel = viewModel
-            it.playPauseBtn.setOnClickListener {
-                viewModel.togglePlaying(requireContext())
-            }
         }
         return binding?.root
     }

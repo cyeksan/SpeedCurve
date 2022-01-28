@@ -15,8 +15,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 class SliderFragment : Fragment() {
     private var binding: FragmentSliderBinding? = null
     private val viewModel: MainViewModel by activityViewModels()
-    private lateinit var mediaFramesArray: IntArray
-    private lateinit var projectFramesArray: IntArray
+    private lateinit var projectAndMediaFrames: HashMap<Int, Int>
 
     companion object {
         fun newInstance() = SliderFragment()
@@ -35,9 +34,6 @@ class SliderFragment : Fragment() {
             it.slider.addOnChangeListener { _, value, _ ->
                 viewModel.updateCurrentMediaFrameWithSliderPosition(value.toInt())
             }
-            it.speedCurveBtn.setOnClickListener {
-                viewModel.enableSpeedCurveFragment(true)
-            }
         }
 
         return binding?.root
@@ -48,23 +44,11 @@ class SliderFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.apply {
-            mediaFramesArray = createMediaFrames(
+            projectAndMediaFrames = generateProjectAndMediaFrames(
                 viewModel.index.value!!, viewModel.speed1.value!!,
                 viewModel.speed2.value!!, viewModel.speed3.value!!
             )
-
-            projectFramesArray = createProjectFrames(mediaFramesArray)
-
-            setSliderMaxValue(projectFramesArray.size - 1)
-
-            sliderEnabled.observe(viewLifecycleOwner) {
-                binding?.slider?.isEnabled = it
-            }
-
-            sliderMaxValue.observe(viewLifecycleOwner) {
-                binding?.slider?.valueTo = it?.toFloat()!!
-            }
-
+            setSliderMaxValue(projectAndMediaFrames.size - 1)
         }
 
     }

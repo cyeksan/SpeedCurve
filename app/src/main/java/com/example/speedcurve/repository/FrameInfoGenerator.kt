@@ -1,6 +1,5 @@
 package com.example.speedcurve.repository
 
-import android.util.Log
 import com.example.speedcurve.model.FrameInfo
 import com.example.speedcurve.util.Constants
 import kotlinx.coroutines.delay
@@ -14,6 +13,8 @@ import javax.inject.Singleton
 @Singleton
 class FrameInfoGenerator @Inject constructor() {
     private val frameInfo = FrameInfo()
+    private val speedArray = FloatArray(Constants.ITEM_SIZE)
+
     private fun createSpeedArrayOfFrames(
         index2: Int,
         speed1: Float,
@@ -21,23 +22,16 @@ class FrameInfoGenerator @Inject constructor() {
         speed3: Float
     ): FloatArray {
         val index1 = 0
-        val index3 = Constants.ITEM_SIZE
-
-        val firstRangeSpeedArray = FloatArray(index2 - index1 + 1)
-        val secondRangeSpeedArray = FloatArray(index3 - index2)
-
-        // Create first range
-        for (i in 0..index2) {
-            firstRangeSpeedArray[i] = linearInterpolation(speed1, i, speed2, speed1, index2, index1)
+        val index3 = Constants.ITEM_SIZE - 1
+        for (i in 0..index3) {
+            if (i <= index2) {
+                speedArray[i] = linearInterpolation(speed1, i, speed2, speed1, index2, index1)
+            } else {
+                speedArray[i] =
+                    linearInterpolation(speed2, i, speed3, speed2, index3, index2)
+            }
         }
-
-        // Create second range
-        for (i in index2 + 1..index3) {
-            secondRangeSpeedArray[i - (index2 + 1)] =
-                linearInterpolation(speed2, (i - index2), speed3, speed2, index3, index2)
-        }
-
-        return firstRangeSpeedArray.plus(removeTheFirstElement(secondRangeSpeedArray))
+        return speedArray
     }
 
     fun createListOfPrintNumbersOfFrames(
@@ -70,28 +64,17 @@ class FrameInfoGenerator @Inject constructor() {
         return printNumberList
     }
 
-    fun generateFrames(
+    fun collectFrames(
         currentProjectFrameValue: Int,
-        mediaFrames: IntArray
+        projectAndMediaFrames: HashMap<Int, Int>
     ): Flow<FrameInfo> = flow {
 
-        for (i in currentProjectFrameValue until mediaFrames.size) {
-            frameInfo.index = i
-            frameInfo.value = mediaFrames[i]
+        for (i in currentProjectFrameValue until projectAndMediaFrames.size) {
+            frameInfo.index = projectAndMediaFrames.keys.elementAt(i)
+            frameInfo.value = projectAndMediaFrames.getValue(i)
             emit(frameInfo)
             delay(Constants.DELAY_TIME)
         }
-    }
-
-    /**
-     * This function removes the duplicate middle element that is common between 2 ranges.
-     * @param arr array of which first item to be removed
-     **/
-    private fun removeTheFirstElement(arr: FloatArray): FloatArray {
-        return (arr.indices)
-            .filter { i: Int -> i != 0 }
-            .map { i: Int -> arr[i] }
-            .toFloatArray()
     }
 
     private fun linearInterpolation(

@@ -15,8 +15,8 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class SpeedCurveFragment : Fragment() {
     private var binding: FragmentSpeedCurveBinding? = null
-
     private val viewModel: MainViewModel by activityViewModels()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -33,8 +33,6 @@ class SpeedCurveFragment : Fragment() {
 
     fun validateAndSetEnteredValues() {
         val result: Boolean
-
-
         viewModel.apply {
             result = validateEditTextValue(
                 binding?.speed1Edt?.text.toString(),
@@ -52,12 +50,9 @@ class SpeedCurveFragment : Fragment() {
                 setCurrentProjectFrameValue(0)
                 setIsSpeedCurveValuesInRange(true)
             }
-
             // SpeedCurveFragment is disabled regardless of the validation result
             enableSpeedCurveFragment(false)
-
         }
-
         // If validation is not successful, a toast message is shown
         if (!result) requireContext().toast(getString(R.string.speed_curve_input_error))
     }
